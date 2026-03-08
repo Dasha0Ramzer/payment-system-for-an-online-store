@@ -12,6 +12,11 @@ def product_fixture() -> Product:
 
 
 @pytest.fixture
+def product_fixture_2() -> Product:
+    return Product("Огурец", "Зеленый", 120.0, 15)
+
+
+@pytest.fixture
 def category_fixture(product_fixture: Product) -> Category:
     return Category("Овощи", "Вкусные и полезные", [product_fixture])
 
