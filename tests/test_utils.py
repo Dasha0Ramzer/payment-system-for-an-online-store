@@ -14,4 +14,4 @@ def test_uploading_data_from_json_file(sample_json: str) -> None:
 
     # Проверяем, что у категории есть один продукт
     assert len(category.products) == 1
-    assert category.products == ["Samsung Galaxy C23 Ultra, 180000.0 руб. Остаток: 5 шт."]
+    assert category.products == ["Samsung Galaxy C23 Ultra, 180000.0 руб. Остаток: 5 шт.\n"]

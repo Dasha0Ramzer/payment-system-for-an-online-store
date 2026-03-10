@@ -22,16 +22,16 @@ class Product:
 
     @property
     def price(self) -> float:
-        '''
+        """
         Метод-геттер, возвращающий цену продукта
-        '''
-        return self.price
+        """
+        return self.__price
 
     @price.setter
     def price(self, new_price: float) -> None:
-        '''
+        """
         Метод-сеттер, изменяющий цену продукта
-        '''
+        """
         if new_price < self.__price:
             print("Цена снижается!")
             user_answer = input('Хотите изменить цену? ("y" = да, "n" = нет): ')
@@ -45,9 +45,9 @@ class Product:
 
     @classmethod
     def new_product(cls, dict_: Any) -> "Product":
-        '''
+        """
         Класс-метод, создающий новый объект класса
-        '''
+        """
         new_product = cls(**dict_)
         for product in Product.all_products:
             if new_product.name == product.name:
@@ -78,17 +78,18 @@ class Category:
         Category.product_count += len(products)
 
     def add_product(self, product: Product) -> None:
-        '''
+        """
         Метод, добавляющий новый продукт категории
-        '''
+        """
         self.__products.append(product)
 
         Category.product_count += 1
 
     @property
     def products(self) -> list[str]:
-        '''
+        """
         Метод-геттер, возвращающий цену и количество продукта
-        :return:
-        '''
-        return [f"{product.name}, {product.price} руб. Остаток: {product.quantity} шт." for product in self.__products]
+        """
+        return [
+            f"{product.name}, {product.price} руб. Остаток: {product.quantity} шт.\n" for product in self.__products
+        ]
