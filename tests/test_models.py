@@ -33,11 +33,8 @@ def test_new_product_creation() -> None:
 def test_category(category_fixture: Category, product_fixture_2: Product) -> None:
     assert category_fixture.name == "Овощи"
     assert category_fixture.description == "Вкусные и полезные"
-    assert category_fixture.products == ["Помидор, 123.45 руб. Остаток: 10 шт.\n"]
+    assert category_fixture.products == "Помидор, 123.45 руб. Остаток: 10 шт.\n"
     assert Category.product_count == 1
     assert Category.category_count == 1
     category_fixture.add_product(product_fixture_2)
-    assert category_fixture.products == [
-        "Помидор, 123.45 руб. Остаток: 10 шт.\n",
-        "Огурец, 120.0 руб. Остаток: 15 шт.\n",
-    ]
+    assert category_fixture.products == "Помидор, 123.45 руб. Остаток: 10 шт.\nОгурец, 120.0 руб. Остаток: 15 шт.\n"

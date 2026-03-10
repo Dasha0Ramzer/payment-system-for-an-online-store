@@ -86,10 +86,11 @@ class Category:
         Category.product_count += 1
 
     @property
-    def products(self) -> list[str]:
+    def products(self) -> str:
         """
         Метод-геттер, возвращающий цену и количество продукта
         """
-        return [
-            f"{product.name}, {product.price} руб. Остаток: {product.quantity} шт.\n" for product in self.__products
-        ]
+        product_str = ""
+        for product in self.__products:
+            product_str += f"{product.name}, {product.price} руб. Остаток: {product.quantity} шт.\n"
+        return product_str
