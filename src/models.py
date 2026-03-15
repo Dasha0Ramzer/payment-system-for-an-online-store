@@ -57,6 +57,18 @@ class Product:
                 return product
         return new_product
 
+    def __str__(self) -> str:
+        """
+        Магический метод, возвращающий строковое отображение
+        """
+        return f"{self.name}, {self.price} руб. Остаток: {self.quantity} шт."
+
+    def __add__(self, other: "Product") -> float:
+        """
+        Магический метод, возвращающий стоимость всех продуктов на складе
+        """
+        return (self.__price * self.quantity) + (other.__price * other.quantity)
+
 
 class Category:
     """
@@ -77,20 +89,55 @@ class Category:
         Category.category_count += 1
         Category.product_count += len(products)
 
-    def add_product(self, product: Product) -> None:
+    def add_product(self, product_: Product) -> None:
         """
         Метод, добавляющий новый продукт категории
         """
-        self.__products.append(product)
+        self.__products.append(product_)
 
         Category.product_count += 1
 
     @property
-    def products(self) -> str:
+    def products(self) -> list[Product]:
         """
-        Метод-геттер, возвращающий цену и количество продукта
+        Метод-геттер, возвращающий список продуктов
         """
-        product_str = ""
-        for product in self.__products:
-            product_str += f"{product.name}, {product.price} руб. Остаток: {product.quantity} шт.\n"
-        return product_str
+        return self.__products
+
+    def __str__(self) -> str:
+        """
+        Магический метод, возвращающий строковое отображение
+        """
+        sum_product = 0
+        for product_ in self.__products:
+            sum_product += product_.quantity
+        return f"{self.name}, количество продуктов: {sum_product} шт."
+
+
+class ProductSearch:
+    """
+    Вспомогательный класс
+    """
+
+    def __init__(self, data: Category):
+        self.data = data
+        self.index = 0
+
+    def __iter__(self) -> "ProductSearch":
+        self.index = 0
+        return self
+
+    def __next__(self) -> str:
+        if self.index < len(self.data.products):
+            result = self.data.products[self.index]
+            # print(self.data.products)
+            # print((result))
+            self.index += 1
+            return str(result)
+        else:
+            raise StopIteration
+
+    def __str__(self) -> str:
+        if self.data.products:
+            return str(self.data.products[0])
+        return ""
