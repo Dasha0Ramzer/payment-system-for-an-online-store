@@ -11,13 +11,4 @@ def test_uploading_data_from_json_file(sample_json: str) -> None:
     # Проверяем свойства категории
     assert category.name == "Смартфоны"
     assert category.description == "Описание категории смартфонов"
-
-    # Проверяем, что у категории есть один продукт
-    assert len(category.products) == 1
-    product = category.products[0]
-
-    # Проверяем свойства продукта
-    assert product.name == "Samsung Galaxy C23 Ultra"
-    assert product.description == "256GB, Серый цвет, 200MP камера"
-    assert product.price == 180000.0
-    assert product.quantity == 5
+    assert category.products == "Samsung Galaxy C23 Ultra, 180000.0 руб. Остаток: 5 шт.\n"
