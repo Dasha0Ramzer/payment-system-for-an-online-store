@@ -1,6 +1,6 @@
 from unittest.mock import Mock, patch
 
-from src.models import Category, Product, ProductSearch
+from src.models import Category, LawnGrass, Product, ProductSearch, Smartphone
 
 
 def test_product(product_fixture: Product, product_fixture_2: Product) -> None:
@@ -9,7 +9,7 @@ def test_product(product_fixture: Product, product_fixture_2: Product) -> None:
     assert product_fixture.price == 123.45
     assert product_fixture.quantity == 10
     sum_products = product_fixture_2 + product_fixture
-    assert sum_products == 3034.5
+    assert sum_products == 1984.5
 
 
 @patch("builtins.input", side_effect="y")
@@ -24,7 +24,7 @@ def test_price(mock_input: Mock, product_fixture: Product) -> None:
 
 
 def test_new_product_creation() -> None:
-    product_dict = {"name": "Огурец", "description": "Зеленый", "price": 50.0, "quantity": 5}
+    product_dict = {"name": "Огурец", "description": "Зеленый", "price": 120.0, "quantity": 5}
     new_product = Product.new_product(product_dict)
     assert new_product.name == "Огурец"
     assert new_product.description == "Зеленый"
@@ -41,7 +41,7 @@ def test_category(category_fixture: Category, product_fixture_2: Product) -> Non
     category_fixture.add_product(product_fixture_2)
     assert [str(product) for product in category_fixture.products] == [
         "Помидор, 123.45 руб. Остаток: 10 шт.",
-        "Огурец, 120.0 руб. Остаток: 15 шт.",
+        "Огурец, 50.0 руб. Остаток: 15 шт.",
     ]
     assert str(category_fixture) == "Овощи, количество продуктов: 25 шт."
 
@@ -58,3 +58,13 @@ def test_product_search() -> None:
 
     assert results[0] == "Samsung Galaxy S23 Ultra, 180000.0 руб. Остаток: 5 шт."
     assert results[1] == "Iphone 15, 210000.0 руб. Остаток: 8 шт."
+
+
+def test_add_smartphone() -> None:
+    smartphone_1 = Smartphone("test_1", "test_2", 10, 5, "test_3", "test_4", 123, "test_5")
+    assert smartphone_1.memory == 123
+
+
+def test_add_lawn_grass() -> None:
+    lawn_grass_1 = LawnGrass("test_1", "test_2", 20, 14, "test_3", 2, "test_4")
+    assert lawn_grass_1.color == "test_4"

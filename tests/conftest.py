@@ -13,7 +13,7 @@ def product_fixture() -> Product:
 
 @pytest.fixture
 def product_fixture_2() -> Product:
-    return Product("Огурец", "Зеленый", 120.0, 15)
+    return Product("Огурец", "Зеленый", 50.0, 15)
 
 
 @pytest.fixture

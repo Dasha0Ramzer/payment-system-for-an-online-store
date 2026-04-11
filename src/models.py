@@ -65,9 +65,55 @@ class Product:
 
     def __add__(self, other: "Product") -> float:
         """
-        Магический метод, возвращающий стоимость всех продуктов на складе
+        Магический метод, возвращающий стоимость всех продуктов на складе, в соответствии с типом продукта
         """
-        return (self.__price * self.quantity) + (other.__price * other.quantity)
+        if type(self) == type(other):
+            return (self.__price * self.quantity) + (other.__price * other.quantity)
+        raise TypeError("Складывать можно только одинаковые типы продуктов")
+
+
+class Smartphone(Product):
+    """
+    Класс товара смартфоны
+    """
+
+    def __init__(
+        self,
+        name: str,
+        description: str,
+        price: float,
+        quantity: int,
+        efficiency: str,
+        model: str,
+        memory: int,
+        color: str,
+    ):
+        super().__init__(name, description, price, quantity)
+        self.efficiency = efficiency
+        self.model = model
+        self.memory = memory
+        self.color = color
+
+
+class LawnGrass(Product):
+    """
+    Класс товара трава газонная
+    """
+
+    def __init__(
+        self,
+        name: str,
+        description: str,
+        price: float,
+        quantity: int,
+        country: str,
+        germination_period: int,
+        color: str,
+    ):
+        super().__init__(name, description, price, quantity)
+        self.country = country
+        self.germination_period = germination_period
+        self.color = color
 
 
 class Category:
@@ -93,9 +139,10 @@ class Category:
         """
         Метод, добавляющий новый продукт категории
         """
-        self.__products.append(product_)
-
+        if not isinstance(product_, Product):
+            raise ValueError("Складывать можно только объекты Product и дочерние от них.")
         Category.product_count += 1
+        return self.__products.append(product_)
 
     @property
     def products(self) -> list[Product]:
@@ -130,8 +177,6 @@ class ProductSearch:
     def __next__(self) -> str:
         if self.index < len(self.data.products):
             result = self.data.products[self.index]
-            # print(self.data.products)
-            # print((result))
             self.index += 1
             return str(result)
         else:
