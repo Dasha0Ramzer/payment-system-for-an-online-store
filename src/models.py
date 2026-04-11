@@ -1,7 +1,31 @@
+from abc import ABC, abstractmethod
 from typing import Any
 
 
-class Product:
+class BaseProduct(ABC):
+
+    @abstractmethod
+    def __init__(self, name: str, description: str, price: float, quantity: int):
+        pass
+
+    @abstractmethod
+    def __str__(self) -> str:
+        pass
+
+    @abstractmethod
+    def __add__(self, other: "Product") -> float:
+        pass
+
+
+class MixinInit:
+    def __init__(self) -> None:
+        print(repr(self))
+
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}({self.name}, {self.price}, {self.quantity})"
+
+
+class Product(BaseProduct, MixinInit):
     """
     Класс для представления товара
     """
@@ -13,6 +37,8 @@ class Product:
     all_products: list["Product"] = []
 
     def __init__(self, name: str, description: str, price: float, quantity: int):
+        super(BaseProduct, self).__init__(name, description, price, quantity)
+        MixinInit.__init__(self)
         self.name = name
         self.description = description
         self.__price = price
@@ -116,7 +142,13 @@ class LawnGrass(Product):
         self.color = color
 
 
-class Category:
+class BaseEntity(ABC):
+    @abstractmethod
+    def __init__(self) -> None:
+        pass
+
+
+class Category(BaseEntity):
     """
     Класс для представления категории товаров
     """
@@ -186,3 +218,14 @@ class ProductSearch:
         if self.data.products:
             return str(self.data.products[0])
         return ""
+
+
+class Order(BaseEntity):
+    """
+    Вспомогательный класс для создания заказа
+    """
+
+    def __init__(self, product: str, quantity: int) -> None:
+        self.product = product
+        self.quantity = quantity
+        self.total_price = quantity * self.product.price
