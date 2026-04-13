@@ -3,6 +3,9 @@ from typing import Any
 
 
 class BaseProduct(ABC):
+    """
+    Абстрактный класс
+    """
 
     @abstractmethod
     def __init__(self, name: str, description: str, price: float, quantity: int):
@@ -18,6 +21,10 @@ class BaseProduct(ABC):
 
 
 class MixinInit:
+    """
+    Класс-миксин
+    """
+
     def __init__(self) -> None:
         print(repr(self))
 
@@ -143,6 +150,10 @@ class LawnGrass(Product):
 
 
 class BaseEntity(ABC):
+    """
+    Абстрактный класс
+    """
+
     @abstractmethod
     def __init__(self) -> None:
         pass
@@ -195,7 +206,7 @@ class Category(BaseEntity):
 
 class ProductSearch:
     """
-    Вспомогательный класс
+    Вспомогательный класс перебора товаров одной категории
     """
 
     def __init__(self, data: Category):
