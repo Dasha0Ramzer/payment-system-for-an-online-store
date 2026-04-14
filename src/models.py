@@ -9,7 +9,10 @@ class BaseProduct(ABC):
 
     @abstractmethod
     def __init__(self, name: str, description: str, price: float, quantity: int):
-        pass
+        self.name = name
+        self.description = description
+        self._price = price
+        self.quantity = quantity
 
     @abstractmethod
     def __str__(self) -> str:
@@ -29,7 +32,7 @@ class MixinInit:
         print(repr(self))
 
     def __repr__(self) -> str:
-        return f"{self.__class__.__name__}({self.name}, {self.price}, {self.quantity})"
+        return f"{self.__class__.__name__}({self.name}, {self._price}, {self.quantity})"
 
 
 class Product(BaseProduct, MixinInit):
@@ -44,28 +47,33 @@ class Product(BaseProduct, MixinInit):
     all_products: list["Product"] = []
 
     def __init__(self, name: str, description: str, price: float, quantity: int):
-        super(BaseProduct, self).__init__(name, description, price, quantity)
-        MixinInit.__init__(self)
-        self.name = name
-        self.description = description
-        self.__price = price
-        self.quantity = quantity
+        BaseProduct.__init__(self, name, description, price, quantity)  # Реализация абстрактного метода
+        MixinInit.__init__(self)  # Вызов init миксина
+        self.all_products.append(self)
 
-        Product.all_products.append(self)
+    # def __init__(self, name: str, description: str, price: float, quantity: int):
+    #     super(BaseProduct, self).__init__(name, description, price, quantity)
+    #     MixinInit.__init__(self)
+    #     self.name = name
+    #     self.description = description
+    #     self.__price = price
+    #     self.quantity = quantity
+    #
+    #     Product.all_products.append(self)
 
     @property
     def price(self) -> float:
         """
         Метод-геттер, возвращающий цену продукта
         """
-        return self.__price
+        return self._price
 
     @price.setter
     def price(self, new_price: float) -> None:
         """
         Метод-сеттер, изменяющий цену продукта
         """
-        if new_price < self.__price:
+        if new_price < self._price:
             print("Цена снижается!")
             user_answer = input('Хотите изменить цену? ("y" = да, "n" = нет): ')
             if user_answer != "y":
@@ -74,7 +82,7 @@ class Product(BaseProduct, MixinInit):
             print("Цена не должна быть нулевая или отрицательная")
             new_price = float(input("Введите новую цену: "))
 
-        self.__price = new_price
+        self._price = new_price
 
     @classmethod
     def new_product(cls, dict_: Any) -> "Product":
@@ -85,8 +93,8 @@ class Product(BaseProduct, MixinInit):
         for product in Product.all_products:
             if new_product.name == product.name:
                 product.quantity += new_product.quantity
-                if product.__price < new_product.__price:
-                    product.__price = new_product.__price
+                if product._price < new_product._price:
+                    product._price = new_product._price
                 return product
         return new_product
 
@@ -101,7 +109,7 @@ class Product(BaseProduct, MixinInit):
         Магический метод, возвращающий стоимость всех продуктов на складе, в соответствии с типом продукта
         """
         if type(self) == type(other):
-            return (self.__price * self.quantity) + (other.__price * other.quantity)
+            return (self._price * self.quantity) + (other._price * other.quantity)
         raise TypeError("Складывать можно только одинаковые типы продуктов")
 
 
@@ -236,7 +244,7 @@ class Order(BaseEntity):
     Вспомогательный класс для создания заказа
     """
 
-    def __init__(self, product: str, quantity: int) -> None:
+    def __init__(self, product: "Product", quantity: int) -> None:
         self.product = product
         self.quantity = quantity
         self.total_price = quantity * self.product.price
