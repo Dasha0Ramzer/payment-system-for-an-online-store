@@ -1,0 +1,128 @@
+from unittest.mock import Mock, patch
+
+import pytest
+
+from src.models import Category, LawnGrass, Order, Product, ProductSearch, Smartphone
+
+
+def test_product(product_fixture: Product, product_fixture_2: Product) -> None:
+    assert product_fixture.name == "Помидор"
+    assert product_fixture.description == "Красный"
+    assert product_fixture.price == 123.45
+    assert product_fixture.quantity == 10
+    sum_products = product_fixture_2 + product_fixture
+    assert sum_products == 1984.5
+
+
+@patch("builtins.input", side_effect="y")
+def test_price_decrease(mock_input: Mock, product_fixture: Product) -> None:
+    product_fixture.price = 50
+    assert product_fixture.price == 50
+
+
+@patch("builtins.input", side_effect="n")
+def test_price(mock_input: Mock, product_fixture: Product) -> None:
+    assert product_fixture.price == 123.45
+
+
+def test_new_product_creation() -> None:
+    product_dict = {"name": "Огурец", "description": "Зеленый", "price": 120.0, "quantity": 5}
+    new_product = Product.new_product(product_dict)
+    assert new_product.name == "Огурец"
+    assert new_product.description == "Зеленый"
+    assert new_product.price == 120.0
+    assert new_product.quantity == 20
+
+
+def test_category(category_fixture: Category, product_fixture_2: Product) -> None:
+    assert category_fixture.name == "Овощи"
+    assert category_fixture.description == "Вкусные и полезные"
+    assert [str(product) for product in category_fixture.products] == ["Помидор, 123.45 руб. Остаток: 10 шт."]
+    assert Category.product_count == 1
+    assert Category.category_count == 1
+    category_fixture.add_product(product_fixture_2)
+    assert [str(product) for product in category_fixture.products] == [
+        "Помидор, 123.45 руб. Остаток: 10 шт.",
+        "Огурец, 50.0 руб. Остаток: 15 шт.",
+    ]
+    assert str(category_fixture) == "Овощи, количество продуктов: 25 шт."
+
+
+def test_product_search() -> None:
+    product1 = Product("Samsung Galaxy S23 Ultra", "256GB, Серый цвет, 200MP камера", 180000.0, 5)
+    product2 = Product("Iphone 15", "512GB, Gray space", 210000.0, 8)
+    product3 = Product("Xiaomi Redmi Note 11", "1024GB, Синий", 31000.0, 14)
+
+    category = Category("Смартфоны", "Описание категории", [product1, product2, product3])
+
+    search = ProductSearch(category)
+    results = [str(product) for product in search]
+
+    assert results[0] == "Samsung Galaxy S23 Ultra, 180000.0 руб. Остаток: 5 шт."
+    assert results[1] == "Iphone 15, 210000.0 руб. Остаток: 8 шт."
+
+
+def test_add_smartphone() -> None:
+    smartphone_1 = Smartphone("test_1", "test_2", 10, 5, "test_3", "test_4", 123, "test_5")
+    assert smartphone_1.memory == 123
+
+
+def test_add_lawn_grass() -> None:
+    lawn_grass_1 = LawnGrass("test_1", "test_2", 20, 14, "test_3", 2, "test_4")
+    assert lawn_grass_1.color == "test_4"
+
+
+def test_raise_product_empty() -> None:
+    with pytest.raises(ValueError):
+        Product("Бракованный товар", "Неверное количество", 1000.0, 0)
+
+
+def test_different_types_of_products() -> None:
+    with pytest.raises(TypeError):
+        product_1 = Smartphone("test_1", "test_2", 10, 5, "test_3", "test_4", 123, "test_5")
+        product_2 = LawnGrass("test_1", "test_2", 20, 14, "test_3", 2, "test_4")
+        product_1 + product_2
+
+
+def test_different_category_products() -> None:
+    with pytest.raises(ValueError):
+        product_1 = Smartphone("test_1", "test_2", 10, 5, "test_3", "test_4", 123, "test_5")
+        product_2 = Order(
+            product_1,
+            5,
+        )
+        category_1 = Category("test_1", "test_2", [product_1])
+        category_1.add_product(product_2) # type: ignore
+
+
+def test_middle_price() -> None:
+    product1 = Product("Samsung Galaxy S23 Ultra", "256GB, Серый цвет, 200MP камера", 180000.0, 5)
+    product2 = Product("Iphone 15", "512GB, Gray space", 210000.0, 8)
+    product3 = Product("Xiaomi Redmi Note 11", "1024GB, Синий", 31000.0, 14)
+    category1 = Category("Смартфоны", "Категория смартфонов", [product1, product2, product3])
+    assert category1.middle_price() == 111629.62962962964
+
+
+def test_middle_price_empty() -> None:
+    category_empty = Category("Пустая категория", "Категория без продуктов", [])
+    assert category_empty.middle_price() == 0
+
+
+def test_product_search_empty() -> None:
+    category = Category("Смартфоны", "Описание категории", [])
+    search = ProductSearch(category)
+    results = str(search)
+    assert results == ""
+
+
+def test_product_search_1() -> None:
+    product1 = Product("test_1", "test_2", 1, 2)
+    category = Category("test", "test", [product1])
+    search = ProductSearch(category)
+    results = str(search)
+    assert results == "test_1, 1 руб. Остаток: 2 шт."
+
+
+def test_order() -> None:
+    product1 = Product("test_1", "test_2", 1, 2)
+    Order(product1, 1)
