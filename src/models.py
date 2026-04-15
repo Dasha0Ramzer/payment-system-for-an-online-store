@@ -12,6 +12,8 @@ class BaseProduct(ABC):
         self.name = name
         self.description = description
         self._price = price
+        if quantity < 1:
+            raise ValueError("Товар с нулевым количеством не может быть добавлен")
         self.quantity = quantity
 
     @abstractmethod
@@ -47,19 +49,9 @@ class Product(BaseProduct, MixinInit):
     all_products: list["Product"] = []
 
     def __init__(self, name: str, description: str, price: float, quantity: int):
-        BaseProduct.__init__(self, name, description, price, quantity)  # Реализация абстрактного метода
-        MixinInit.__init__(self)  # Вызов init миксина
+        BaseProduct.__init__(self, name, description, price, quantity)
+        MixinInit.__init__(self)
         self.all_products.append(self)
-
-    # def __init__(self, name: str, description: str, price: float, quantity: int):
-    #     super(BaseProduct, self).__init__(name, description, price, quantity)
-    #     MixinInit.__init__(self)
-    #     self.name = name
-    #     self.description = description
-    #     self.__price = price
-    #     self.quantity = quantity
-    #
-    #     Product.all_products.append(self)
 
     @property
     def price(self) -> float:
@@ -157,6 +149,19 @@ class LawnGrass(Product):
         self.color = color
 
 
+class EventHandlingExceptions(Exception):
+    """
+    Общий класс исключения, который отвечает за обработку событий,
+    когда в «Категорию» или «Заказ» добавляется товар с нулевым количеством
+    """
+
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        self.message = args[0] if args else "Неизвестная ошибка скрипта."
+
+    def __str__(self) -> str:
+        return self.message
+
+
 class BaseEntity(ABC):
     """
     Абстрактный класс
@@ -190,10 +195,19 @@ class Category(BaseEntity):
         """
         Метод, добавляющий новый продукт категории
         """
+        if product_.quantity == 0:
+            raise EventHandlingExceptions("Нельзя добавлять продукт с нулевым количеством")
         if not isinstance(product_, Product):
             raise ValueError("Складывать можно только объекты Product и дочерние от них.")
+        try:
+            self.__products.append(product_)
+            print("Товар добавлен успешно")
+        except EventHandlingExceptions as e:
+            print(e)
+        finally:
+            print("Обработка добавления товара завершена")
+
         Category.product_count += 1
-        return self.__products.append(product_)
 
     @property
     def products(self) -> list[Product]:
@@ -210,6 +224,17 @@ class Category(BaseEntity):
         for product_ in self.__products:
             sum_product += product_.quantity
         return f"{self.name}, количество продуктов: {sum_product} шт."
+
+    def middle_price(self) -> float:
+        """
+        Метод, который подсчитывает средний ценник всех товаров
+        """
+        try:
+            total_cost = sum(map(lambda product: product.price * product.quantity, self.products))
+            total_quantity = sum(map(lambda product: product.quantity, self.products))
+            return total_cost / total_quantity
+        except ArithmeticError:
+            return 0
 
 
 class ProductSearch:
@@ -246,5 +271,13 @@ class Order(BaseEntity):
 
     def __init__(self, product: "Product", quantity: int) -> None:
         self.product = product
-        self.quantity = quantity
+        if quantity <= 0:
+            raise EventHandlingExceptions("Нельзя заказать продукт с нулевым количеством")
+        try:
+            self.quantity = quantity
+            print("Товар добавлен успешно")
+        except EventHandlingExceptions as e:
+            print(e)
+        finally:
+            print("Обработка добавления товара завершена")
         self.total_price = quantity * self.product.price
